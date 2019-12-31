@@ -4,6 +4,7 @@ project(Project C)
 
 set(SRC
 	src/main.c
+	src/tank.c
 	)
 
 include_directories(./include)
@@ -14,4 +15,4 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(run ${SRC})
 
-target_link_libraries(run)
+target_link_libraries(run SDL2)
