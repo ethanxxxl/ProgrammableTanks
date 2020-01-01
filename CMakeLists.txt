@@ -15,4 +15,4 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(run ${SRC})
 
-target_link_libraries(run SDL2)
+target_link_libraries(run m SDL2)

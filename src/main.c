@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <tank.h>
+#include <time.h>
 
 #define WIN_SIZE_X 400
 #define WIN_SIZE_Y 350
@@ -64,13 +65,17 @@ int main()
 	/* tank stuff
 	 */
 	struct Tank t1;
-	t1.bounding_box = (struct SDL_Rect){ 30, 30, 20, 24 };
-	
+	t1.bounds = (struct Rect){ 200, 200, 100, 150 };
+
 	while ( run_game )
 	{
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderClear(renderer);
 
+
+		t1.rot = 3*(float)clock()/CLOCKS_PER_SEC;
+
+		printf("%lf\n", t1.rot);
 		draw_tank(renderer, &t1);
 
 		SDL_RenderPresent(renderer);
