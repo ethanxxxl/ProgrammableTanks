@@ -46,8 +46,20 @@ void tank_move(struct Tank* t, float distance)
 	t->bounds.y += cos(t->rot)*distance;
 }
 
+void tank_rotate(struct Tank* t, float angle)
+{
+	t->rot += angle;
+	t->turret_angle += angle;
+}
+
+void tank_rotate_turret(struct Tank* t, float angle)
+{
+	t->turret_angle += angle;
+}
+
 struct Point rotate_point(struct Point center, struct Point arm, float angle)
 {
+	// this is the 2D rotation function that I found on wikipedia.
 	return
 	(struct Point){
 		cos(angle)*(arm.x-center.x) - sin(angle)*(arm.y-center.y) + center.x,

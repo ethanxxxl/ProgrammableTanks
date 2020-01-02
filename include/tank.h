@@ -38,8 +38,11 @@ struct Tank
 // function that draws the tank.
 void tank_draw(struct SDL_Renderer* renderer, struct Tank* tank);
 
-// TODO fill in these functions (they will need to take time into account somehow)
+// rotates the tanks body.
 void tank_rotate(struct Tank* t, float angle);
+
+// rotates the tanks turret.
+void tank_rotate_turret(struct Tank* t, float angle);
 
 // moves a tank in a line, based off of it orientation
 void tank_move(struct Tank* t, float distance);
