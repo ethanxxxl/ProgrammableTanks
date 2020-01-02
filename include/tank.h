@@ -35,13 +35,16 @@ struct Tank
 	bool destroyed;
 };
 
-
-void draw_tank(struct SDL_Renderer* renderer, struct Tank* tank);
+// function that draws the tank.
+void tank_draw(struct SDL_Renderer* renderer, struct Tank* tank);
 
 // TODO fill in these functions (they will need to take time into account somehow)
-void rotate_tank();
-void move_tank();
+void tank_rotate(struct Tank* t, float angle);
 
+// moves a tank in a line, based off of it orientation
+void tank_move(struct Tank* t, float distance);
+
+// helper function for rotating a point about another point.
 struct Point rotate_point(struct Point center, struct Point arm, float angle);
 
 #endif
