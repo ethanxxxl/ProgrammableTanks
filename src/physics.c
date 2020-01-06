@@ -1,39 +1,53 @@
 #include <physics.h>
 #include <stdlib.h>
+#include <array.h>
 
 // master list of all rigid bodies that are managed by the physics engine.
-static struct RigidBody* rb_buff;
-static int rb_buff_size;
-static int rb_buff_current_empty;
+// each element is a pointer to a rigidbody.
+Array* rb_buff;
 
 int physics_init()
 {
 	// we will start with space for 10 rigid bodies. because I like the number 10.
-	rb_buff_size = 10;
-	rb_buff_current_empty= 0;
-	rb_buff = malloc(sizeof(struct RigidBody*) * rb_buff_size);
+	rb_buff = array_init(10, sizeof(RigidBody**));
+
+	// check if malloc was successfull.
+	if ( rb_buff == NULL )
+		return -1;
+
 	return 0;
 }
 
-int physics_stop()
+
+
+void physics_stop()
 {
-	return 0;
+	for ( int i = 0; i < array_get_size(rb_buff); i++ )
+{
+		// free all the rigidbodies
+		free(*(RigidBody**)array_get(rb_buff, i));
+	}
+
+	// free the buffer.
+	array_kill(rb_buff);
+}
+
+RigidBody* physics_add_rigidbody()
+{
+	RigidBody* rb_new = malloc(sizeof(RigidBody));
+	if ( rb_new == NULL ) // make sure malloc was successful
+		return NULL;
+
+	array_add(rb_buff, &rb_new);
+	
+	return rb_new;
 }
 
 void physics_update()
 {
-	// this is where the real meaty suff is going to happen.
-}
+	// solve for all forces
+// update positions
+// check for collisions
+// move objects and update forces.
 
-void physics_add_rigidbody(struct RigidBody** rb)
-{
-	if ( rb_buff_current_empty >= rb_buff_size )
-	{
-		// this doubles the size of the buffer. This decreases the amount of times that
-		// realloc will need to be called.
-		rb_buff = realloc(rb_buff, sizeof(struct RigidBody*)*rb_buff_size*2);
-	}
-
-	*rb = rb_buff + rb_buff_current_empty;
-	rb_buff_current_empty++;
 }

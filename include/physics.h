@@ -12,13 +12,9 @@
  *
  */
 
+#include <stdlib.h>
 #include <stdbool.h>
-
-struct Point
-{
-	float x;
-	float y;
-};
+#include <vmath.h>
 
 
 /*
@@ -61,26 +57,37 @@ union Bound_Types
 	struct Polygon p;
 };
 
-struct RigidBody
+typedef struct RigidBody
 {
 	union Bound_Types bounds;
-	struct Point pos;
+	Vec2 pos;
 	float rot;
 	float weight;
 
-	bool can_collide;
-};
+	float velocity;
+
+	Vec2* forces; // list of forces acting on object in newtons
+	int num_forces;
+} RigidBody;
+
+void rb_add_force(RigidBody* rb);
 
 // start and stop the physics engine
 // returns 0 on success and -1 on error
 int physics_init();
-int physics_stop();
+void physics_stop();
 
 // update the physics engine
 void physics_update();
 
 // creates a rigidbody, and adds it to the physcis engine.
-void physics_add_rigidbody(struct RigidBody** rb);
+// this allows the addition of structures of types other than RigidBody,
+// as long as rigidbody is the first item in the struct, and the size of the
+// parent struct is passed to the function.
+// if size is null, then the size of struct RigidBody will be used.
+RigidBody* physics_add_rigidbody();
+
+// TODO add support for this.
 //void physics_remove_rigidbody(struct RigidBody* rb);
 
 #endif
