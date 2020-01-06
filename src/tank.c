@@ -22,7 +22,8 @@ void tank_draw(SDL_Renderer* renderer, struct Tank* t)
 	// rotating and filling in the tank body points
 	for ( int i = 0; i < 5; i++ )
 	{
-		Vec2 p = vec2_rotate(points+i, t->rb->rot);
+		Vec2 p;
+		vec2_rotate(points+i, t->rb->rot, &p);
 		p.x += t->rb->pos.x;
 		p.y += t->rb->pos.y;
 
@@ -31,7 +32,7 @@ void tank_draw(SDL_Renderer* renderer, struct Tank* t)
 	}
 
 	Vec2 turret = {0, t->rb->bounds.r.h/2};
-	turret = vec2_rotate(&turret, t->turret_angle);
+	vec2_rotate(&turret, t->turret_angle, &turret);
 	turret.x += t->rb->pos.x;
 	turret.y += t->rb->pos.y;
 
