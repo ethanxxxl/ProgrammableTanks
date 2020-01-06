@@ -159,9 +159,12 @@ int main()
 
 	t1.rb->rot = 0;
 	t1.turret_angle = 0;
+	t1.rb->mass = 0.5;
+	t1.rb->pos = (Vec2){ 50, 50 };
 
 	while ( run_game )
 	{
+		physics_update();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderClear(renderer);
 

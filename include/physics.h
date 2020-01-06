@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <vmath.h>
+#include <array.h>
 
 
 /*
@@ -49,7 +50,7 @@ struct Polygon
 	int num_p;
 };
 
-union Bound_Types
+union Bound_Data
 {
 	struct Rect r;
 	struct Circle c;
@@ -57,16 +58,20 @@ union Bound_Types
 	struct Polygon p;
 };
 
+enum bound_types { RECT, SQUARE, CIRCLE, POLYGON };
+
 typedef struct RigidBody
 {
-	union Bound_Types bounds;
-	Vec2 pos;
+	union Bound_Data bounds;
+	enum bound_types bound_type;
+
 	float rot;
-	float weight;
+	float mass;
 
-	float velocity;
+	Vec2 pos;
+	Vec2 velocity;
 
-	Vec2* forces; // list of forces acting on object in newtons
+	Array* forces; // <Vec2> list of forces acting on object in newtons
 	int num_forces;
 } RigidBody;
 
@@ -80,11 +85,9 @@ void physics_stop();
 // update the physics engine
 void physics_update();
 
-// creates a rigidbody, and adds it to the physcis engine.
-// this allows the addition of structures of types other than RigidBody,
-// as long as rigidbody is the first item in the struct, and the size of the
-// parent struct is passed to the function.
-// if size is null, then the size of struct RigidBody will be used.
+/* Creates a rigidbody in the physics engine.
+ * Return: returns a pointer to that RigidBody, returns NULL of failure.
+ */
 RigidBody* physics_add_rigidbody();
 
 // TODO add support for this.
