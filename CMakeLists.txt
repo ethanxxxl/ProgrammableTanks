@@ -3,9 +3,12 @@ cmake_minimum_required(VERSION 3.10)
 project(Project C)
 
 set(SRC
-	src/main.c
-	src/tank.c
+	src/array.c
 	src/handle_input.c
+	src/main.c
+	src/physics.c
+	src/tank.c
+	src/vmath.c
 	)
 
 include_directories(./include)

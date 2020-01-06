@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <physics.h>
 
 // the rotation speed of the turret in degrees/sec
 #define TURRET_ROT_SPEED 10
@@ -11,26 +12,23 @@
 #define TANK_MOV_SPEED 10
 #define TANK_ACCELERATION 1
 
-struct Point
-{
-	float x;
-	float y;
-};
-
-struct Rect
-{
-	float x;
-	float y;
-	float h;
-	float w;
-};
-
 struct Tank
 {
-	// possition and orientation
-	struct Rect bounds;
-	float rot;
+	// managed rigidbody used by the physics engine.
+	RigidBody* rb;
+
 	float turret_angle;
+
+	// this is the max speed. the max rotation speed is a function
+	// of this and the width of the tank.
+	float max_speed;
+	float max_turret_speed;
+
+	// fire rate measured in rounds per second
+	float fire_rate;
+	
+	// the number of rounds left to shoot. this value should be -1 if infinity.
+	int rounds;
 
 	bool destroyed;
 };
@@ -46,8 +44,5 @@ void tank_rotate_turret(struct Tank* t, float angle);
 
 // moves a tank in a line, based off of it orientation
 void tank_move(struct Tank* t, float distance);
-
-// helper function for rotating a point about another point.
-struct Point rotate_point(struct Point center, struct Point arm, float angle);
 
 #endif

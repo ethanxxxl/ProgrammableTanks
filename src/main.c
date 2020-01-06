@@ -5,6 +5,24 @@
 #include <tank.h>
 #include <time.h>
 #include <handle_input.h>
+#include <physics.h>
+
+/*
+ * my problem is: I need to be able to shoot other tanks.
+ *  - when the tank shoots, it needs to draw the "projectile" (a line will suffice)
+ *  - it shooting function needs to be able to detect an intersection between the line and the other tank.
+ *		- probably could use SAT for this?
+ *	- the function needs to have access to struct pointer of the other tank, so it can set it destroyed
+ *
+ *	because I could probably use SAT for detecting the intersection of the projectile and the other tank, I could just implement
+ *	a physics engine. let me do some more research.
+ *	
+ *	ok research is done. I have decided that I will be using SAT for the ray casting.
+ *
+ *	this means that I will need a physics separate physcs subsystem.
+ *	
+ *	here we go...
+ */
 
 #define WIN_SIZE_X 400
 #define WIN_SIZE_Y 350
@@ -13,7 +31,6 @@ bool run_game = true;
 
 struct Tank t1;
 
-// TODO figure out how to do this properly, so that there aren't any jumps or crap like that.
 void movement_helper(void (*movement_callback)(struct Tank* t, float x), float x, struct timespec* last_time, key_state toggle)
 {
 	if ( toggle == DOWN )
@@ -26,8 +43,6 @@ void movement_helper(void (*movement_callback)(struct Tank* t, float x), float x
 		// calculate the delta time between the current frame and the last frame.
 		double dt = (double)current_time.tv_nsec/1000000000 - (double)last_time->tv_nsec/1000000000;
 		dt += (double)current_time.tv_sec - (double)last_time->tv_sec;
-
-	//	printf("%lf, %ld.%ld\n", dt, last_time.tv_sec, last_time.tv_nsec/1000000000);
 
 		// move the tank.
 		movement_callback(&t1, x*dt);
@@ -71,13 +86,13 @@ void t1_d(key_state toggle)
 void t1_j(key_state toggle)
 {
 	static struct timespec last_time;
-	movement_helper(&tank_rotate_turret, -1, &last_time, toggle);
+	movement_helper(&tank_rotate_turret, -1.25, &last_time, toggle);
 }
 
 void t1_k(key_state toggle)
 {
 	static struct timespec last_time;
-	movement_helper(&tank_rotate_turret, 1, &last_time, toggle);
+	movement_helper(&tank_rotate_turret, 1.25, &last_time, toggle);
 }
 
 void quit(key_state toggle)
@@ -119,13 +134,15 @@ int main()
 	SDL_Renderer* renderer;
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+	/* Physics
+	 */
+	physics_init();
 
 	/* tank stuff
 	 */
-	t1.bounds = (struct Rect){ 200, 200, 50, 35 };
+	t1.rb = physics_add_rigidbody();
+	t1.rb->bounds.r = (struct Rect){ 50, 35 };
 	t1.turret_angle = M_PI/4;
-
-
 
 	// this is the list of keys and functions associated with them.
 	#define NUM_KEYS 7
@@ -140,7 +157,7 @@ int main()
 		{ SDL_SCANCODE_K, &t1_k, UP }
 	};
 
-	t1.rot = 0;
+	t1.rb->rot = 0;
 	t1.turret_angle = 0;
 
 	while ( run_game )
@@ -157,6 +174,8 @@ int main()
 		SDL_RenderPresent(renderer);
 		handle_input(keys, NUM_KEYS);
 	}
+
+	physics_stop();
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
