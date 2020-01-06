@@ -19,8 +19,7 @@ typedef struct Array Array;
  */
 Array* array_init(int n, size_t unit_size);
 
-/* Frees that was allocated to an arrar
- * Return: none
+/* Frees memory that was allocated to an array
  */
 void array_kill(Array* arr);
 
@@ -34,15 +33,15 @@ Array* array_resize(Array* arr, int n);
  */
 int array_get_size(const Array* arr);
 
-
 /* Adds data to the array. Data should be the same type that the array was
  * initialized as.
  */
 void array_add(Array* arr, void* data);
 
-
-// TODO implement this
-void array_remove(int index);
+/* Removes the element at index. If the index is larger than the array_get_size, then
+ *  nothing is done.
+ */
+void array_remove(Array* arr, int index);
 
 /* Gets the element at index.
  * Return: returns a void pointer, that must be dereferenced, to the location.
@@ -54,5 +53,18 @@ void* array_get(const Array* arr, int index);
  */
 void* array_get_into(const Array* arr, void* dest, int index);
 
+/* Copies the data from src into the array element at index.
+ */
 void array_set(Array* arr, void* src, int index);
+
+/* Resets the array back to 0 elements
+ * Note: this does not overwrite the data in those positions. use array_clear
+ * for that.
+ */
+void array_reset(Array* arr);
+
+/* Resets the array back to 0 elements and overwrites the data that was there.
+ */
+void array_clear(Array* arr);
 #endif
+

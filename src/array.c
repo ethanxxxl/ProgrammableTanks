@@ -78,11 +78,30 @@ void array_add(Array* arr, void* data)
 	memcpy(p, data, arr->_unit_size);
 }
 
+void array_remove(Array* arr, int index)
+{
+	if ( index > arr->_num_elements )
+		return; // nothing to remove
+
+	if ( index == arr->_num_elements )
+	{
+		memset(arr->buff + arr->_unit_size*index, 0, arr->_unit_size);
+		arr->_num_elements--;
+		return;
+	}
+
+	memmove(
+			arr->buff + (index * arr->_unit_size),
+			arr->buff + ((index+1) * arr->_unit_size),
+			(arr->_num_elements - index) * arr->_unit_size
+			);
+	arr->_num_elements--;
+}
+
 void* array_get(const Array* arr, int index)
 {
 	return arr->buff + arr->_unit_size * index / sizeof(char);
 }
-
 
 void* array_get_into(const Array* arr, void* dest, int index)
 {
@@ -106,4 +125,15 @@ void array_set(Array* arr, void* src, int index)
 	// copy the value at src into the position in the buffer
 	void* p = arr->buff + arr->_unit_size * index / sizeof(char);
 	memcpy(p, src, arr->_unit_size);
+}
+
+void array_reset(Array* arr)
+{
+	arr->_num_elements = 0;
+}
+
+void array_clear(Array* arr)
+{
+	memset(arr->buff, 0, arr->_unit_size * arr->_num_elements);
+	arr->_num_elements = 0;
 }
