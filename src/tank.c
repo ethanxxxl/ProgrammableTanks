@@ -31,18 +31,19 @@ void tank_draw(SDL_Renderer* renderer, struct Tank* t)
 		sdl_points[i].y = p.y;
 	}
 
+	// there needs to be a temporary point for the rotation.
+	Vec2 tmp;
 	Vec2 turret = {0, t->rb->bounds.r.h/2};
-	vec2_rotate(&turret, t->turret_angle, &turret);
-	turret.x += t->rb->pos.x;
-	turret.y += t->rb->pos.y;
+	vec2_rotate(&turret, t->turret_angle, &tmp);
+	vec2_add(&tmp, &t->rb->pos, &tmp);
 
 	// draw body
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderDrawLines(renderer, sdl_points, 5);
 
-	// draw gun
+	// draw turret
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderDrawLine(renderer, t->rb->pos.x, t->rb->pos.y, turret.x, turret.y);
+	SDL_RenderDrawLine(renderer, t->rb->pos.x, t->rb->pos.y, tmp.x, tmp.y);
 }
 
 void tank_move(struct Tank* t, float distance)
