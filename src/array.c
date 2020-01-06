@@ -5,7 +5,7 @@
 typedef struct Array
 {
 	size_t _unit_size;
-	size_t _buff_size;
+    int _capacity;
 	int _num_elements;
 
 	char* buff;
@@ -24,9 +24,10 @@ Array* array_init(int n, size_t unit_size)
 		return NULL;
 
 	// update the buffer size and unit size trackers.
-	arr->_buff_size = unit_size * n*2;
 	arr->_unit_size = unit_size;
-	arr->_num_elements = n;
+    arr->_capacity = n;
+
+	arr->_num_elements = 0;
 
 	return arr;
 }
@@ -44,8 +45,8 @@ Array* array_resize(Array* arr, int n)
 	if ( arr->buff == NULL ) // make sure that realloc was successful
 		return NULL;
 	
-	// set the buff size tracker
-	arr->_buff_size = n*arr->_unit_size;
+	// set the capacity tracker
+	arr->_capacity = n;
 
 	// update the elements tracker.
 	if ( arr->_num_elements > n )
@@ -54,7 +55,7 @@ Array* array_resize(Array* arr, int n)
 	return arr;
 }
 
-int array_get_size(Array* arr)
+int array_get_size(const Array* arr)
 {
 	return arr->_num_elements;
 }
@@ -62,11 +63,11 @@ int array_get_size(Array* arr)
 void array_add(Array* arr, void* data)
 {
 	// check if there is enough space to add the new element
-	if ( arr->_num_elements * arr->_unit_size >= arr->_buff_size )
+	if ( arr->_num_elements >= arr->_capacity )
 	{
 		// the buffer was to small. double the buffer size.
-		arr->buff = realloc(arr->buff, arr->_buff_size*2);
-		arr->_buff_size *= 2; // update the buffersize tracker.
+		arr->buff = realloc(arr->buff, arr->_capacity*arr->_unit_size*2);
+		arr->_capacity *= 2; // update the capacity tracker.
 	}
 
 	// pointer to the location that data should be written.
@@ -77,7 +78,7 @@ void array_add(Array* arr, void* data)
 	memcpy(p, data, arr->_unit_size);
 }
 
-void* array_get(Array* arr, int index)
+void* array_get(const Array* arr, int index)
 {
 	return arr->buff + arr->_unit_size * index / sizeof(char);
 }
@@ -92,13 +93,13 @@ void* array_get_into(const Array* arr, void* dest, int index)
 
 void array_set(Array* arr, void* src, int index)
 {
-	if ( index * arr->_unit_size >= arr->_buff_size )
+	if ( index >= arr->_capacity )
 	{
 		// if program control reaches here, that means that the index is bigger than the buffer
 		arr->buff = realloc(arr->buff, index*arr->_unit_size*2);
 
 		// update the buffer and element trackers.
-		arr->_buff_size = index*arr->_unit_size*2;
+		arr->_capacity = index*2;
 		arr->_num_elements = index + 1;
 	}
 		

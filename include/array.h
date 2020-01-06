@@ -12,7 +12,7 @@
 
 typedef struct Array Array;
 
-/* Initializes an array
+/* Initializes an array, with the starting capacity of n units
  * Return: on failure, it returns NULL. on success, it returns a pointer
  *  on success, it returns a pointer to an Array structure.
  * Notes: Do not create your own Array struct. Let the system do it for you.
@@ -32,7 +32,7 @@ Array* array_resize(Array* arr, int n);
 
 /* Simply returns the size of the array
  */
-int array_get_size(Array* arr);
+int array_get_size(const Array* arr);
 
 
 /* Adds data to the array. Data should be the same type that the array was
@@ -45,9 +45,9 @@ void array_add(Array* arr, void* data);
 void array_remove(int index);
 
 /* Gets the element at index.
- * Return: returns a void pointer, that must be cast, to the location.
+ * Return: returns a void pointer, that must be dereferenced, to the location.
  */
-void* array_get(Array* arr, int index);
+void* array_get(const Array* arr, int index);
 
 /* Gets the element at index and copies it into the position at dest.
  * Return: returns a void pointer, that must be cast, to the location.
