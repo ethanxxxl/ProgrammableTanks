@@ -46,7 +46,7 @@ struct Circle
 // these should be convex polygons.
 struct Polygon
 {
-	struct Point* p; /* note that these are local points */
+	struct Vec2* p; /* note that these are local points */
 	int num_p;
 };
 
@@ -64,6 +64,7 @@ typedef struct RigidBody
 {
 	union Bound_Data bounds;
 	enum bound_types bound_type;
+	int ID; // this is just the RigidBodies index in the rb_buff array
 
 	float rot;
 	float mass;
@@ -75,6 +76,12 @@ typedef struct RigidBody
 	int num_forces;
 } RigidBody;
 
+struct Collision
+{
+	RigidBody* rb1;
+	RigidBody* rb2;
+};
+
 void rb_add_force(RigidBody* rb);
 
 // start and stop the physics engine
@@ -84,6 +91,7 @@ void physics_stop();
 
 // update the physics engine
 void physics_update();
+float rb_find_radius(RigidBody* rb);
 
 /* Creates a rigidbody in the physics engine.
  * Return: returns a pointer to that RigidBody, returns NULL of failure.
