@@ -27,7 +27,7 @@ Vec2* vec2_sub(Vec2* v1, Vec2* v2, Vec2* result)
 }
 float vec2_dot(Vec2* v1, Vec2* v2)
 {
-	return vec2_get_mag(v1) * vec2_get_mag(v2) * cos(vec2_get_angle(v1, v2));
+	return (v1->x * v2->x) + (v1->y * v2->y);
 }
 
 Vec2* vec2_scale(Vec2* v1, float a, Vec2* result)
