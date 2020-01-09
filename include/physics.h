@@ -73,7 +73,6 @@ typedef struct RigidBody
 	Vec2 velocity;
 
 	Array* forces; // <Vec2> list of forces acting on object in newtons
-	int num_forces;
 } RigidBody;
 
 struct Collision
@@ -82,8 +81,8 @@ struct Collision
 	RigidBody* rb2;
 };
 
-void rb_add_force(RigidBody* rb);
-
+/* Physics functions
+ */
 // start and stop the physics engine
 // returns 0 on success and -1 on error
 int physics_init();
@@ -91,14 +90,30 @@ void physics_stop();
 
 // update the physics engine
 void physics_update();
-float rb_find_radius(RigidBody* rb);
+
 
 /* Creates a rigidbody in the physics engine.
  * Return: returns a pointer to that RigidBody, returns NULL of failure.
  */
 RigidBody* physics_add_rigidbody();
 
+
 // TODO add support for this.
 //void physics_remove_rigidbody(struct RigidBody* rb);
 
+/* RigidBody Functions
+ */
+float rb_find_radius(const RigidBody* rb);
+void rb_add_force(RigidBody* rb);
+
+/* Bounds Functions
+ */
+
+/* Transforms the data in the union to a polygon, provided that the union
+ * is of type square or rect. The vertex data is placed in the buffer
+ * pointed to by buff.
+ * Notes: - It will not convert circles.
+ *        - poly.p must be large enough to hold at least 4 vertices
+ */
+void rect_to_polygon(const union Bound_Data* bd, enum bound_types bt, struct Polygon* poly);
 #endif

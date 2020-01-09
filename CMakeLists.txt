@@ -20,4 +20,4 @@ set(CMAKE_BUILD_TYPE Debug)
 add_executable(run ${SRC})
 set_property(TARGET run PROPERTY C_STANDARD 11)
 
-target_link_libraries(run m SDL2)
+target_link_libraries(run m SDL2 SDL2_gfx)

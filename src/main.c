@@ -6,6 +6,7 @@
 #include <time.h>
 #include <handle_input.h>
 #include <physics.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 /*
  * my problem is: I need to be able to shoot other tanks.
@@ -30,6 +31,7 @@
 bool run_game = true;
 
 struct Tank t1;
+struct Tank t2;
 
 void movement_helper(void (*movement_callback)(struct Tank* t, float x), float x, struct timespec* last_time, key_state toggle)
 {
@@ -142,7 +144,21 @@ int main()
 	 */
 	t1.rb = physics_add_rigidbody();
 	t1.rb->bounds.r = (struct Rect){ 50, 35 };
-	t1.turret_angle = M_PI/4;
+	t1.rb->bound_type = RECT;
+	t1.rb->rot = 0;
+	t1.rb->mass = 0.5;
+	t1.rb->pos = (Vec2){ 100, 50 };
+	t1.turret_angle = 0;
+	t1.rb->velocity = (Vec2){ 0, 0 };
+
+	t2.rb = physics_add_rigidbody();
+	t2.rb->bounds.r = (struct Rect){ 50, 35 };
+	t2.rb->bound_type = RECT;
+	t2.rb->rot = 0;
+	t2.rb->mass = 0.5;
+	t2.rb->pos = (Vec2){ 50, 50 };
+	t2.turret_angle = 0;
+	t2.rb->velocity = (Vec2){ 0, 0 };
 
 	// this is the list of keys and functions associated with them.
 	#define NUM_KEYS 7
@@ -157,26 +173,28 @@ int main()
 		{ SDL_SCANCODE_K, &t1_k, UP }
 	};
 
-	t1.rb->rot = 0;
-	t1.turret_angle = 0;
-	t1.rb->mass = 0.5;
-	t1.rb->pos = (Vec2){ 50, 50 };
 
 	while ( run_game )
 	{
-		physics_update();
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderClear(renderer);
+		physics_update();
 
 		//t1.rot = 3*(float)clock()/CLOCKS_PER_SEC;
 		//t1.turret_angle = 4*(float)clock()/CLOCKS_PER_SEC;
 		
-
+		tank_draw(renderer, &t2);
 		tank_draw(renderer, &t1);
+	
+		float t1_rad = rb_find_radius(t1.rb);
+		//circleRGBA(renderer, t1.rb->pos.x, t1.rb->pos.y, t1_rad, 0xff, 0xff, 0xff, 0x55);
+		//circleRGBA(renderer, t2.rb->pos.x, t2.rb->pos.y, t1_rad, 0xff, 0xff, 0xff, 0x55);
 
 		SDL_RenderPresent(renderer);
 		handle_input(keys, NUM_KEYS);
+		printf("\n");
 	}
+
 
 	physics_stop();
 
