@@ -41,11 +41,9 @@ void physics_stop()
 {
 	for ( int i = 0; i < array_get_size(rb_buff); i++ )
 	{
-		// free the forces array. (it's complicated, I know)
-		Array* a = (**(RigidBody**)array_get(rb_buff, i)).forces;
-		array_kill(a);
-		// free all the rigidbodies
-		free(*(RigidBody**)array_get(rb_buff, i));
+		// just call this on every RigidBody, so that there doesn't have to be
+		// repeat code
+		physics_remove_rigidbody(*(RigidBody**)array_get(rb_buff, i));
 	}
 
 	// free the buffer.
@@ -59,18 +57,28 @@ void physics_stop()
 RigidBody* physics_add_rigidbody()
 {
 	// create space for the rigidbody
-	RigidBody* rb_new = malloc(sizeof(RigidBody));
+	RigidBody* rb_new = calloc(1, sizeof(RigidBody));
 	if ( rb_new == NULL ) // make sure malloc was successful
 		return NULL;
 
 	// add that space to the master list of RigidBodies
-	array_add(rb_buff, &rb_new);
-	rb_new->ID = array_get_size(rb_buff) - 1;
+	// also sets the ID for the RigidBody, so that it can be removed.
+	rb_new->_ID = array_add(rb_buff, &rb_new);
 
 	// initialize the forces array.
 	rb_new->forces = array_init(2, sizeof(Vec2));
 
 	return rb_new;
+}
+
+void physics_remove_rigidbody(RigidBody* rb)
+{
+	// remove rb from the physics RigidBody buffer
+	array_remove(rb_buff, rb->_ID);
+	// kill the forces array
+	array_kill(rb->forces);
+	// free the space allocated for the RigidBody
+	free(rb);
 }
 
 // finds the largest radius of a rigid body

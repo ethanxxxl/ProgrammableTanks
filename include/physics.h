@@ -64,7 +64,7 @@ typedef struct RigidBody
 {
 	union Bound_Data bounds;
 	enum bound_types bound_type;
-	int ID; // this is just the RigidBodies index in the rb_buff array
+	int _ID; // this is just the RigidBodies index in the rb_buff array
 
 	float rot;
 	float mass;
@@ -99,7 +99,7 @@ RigidBody* physics_add_rigidbody();
 
 
 // TODO add support for this.
-//void physics_remove_rigidbody(struct RigidBody* rb);
+void physics_remove_rigidbody(struct RigidBody* rb);
 
 /* RigidBody Functions
  */
