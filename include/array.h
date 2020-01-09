@@ -35,8 +35,9 @@ int array_get_size(const Array* arr);
 
 /* Adds data to the array. Data should be the same type that the array was
  * initialized as.
+ * Return: returns the index of the data in the array.
  */
-void array_add(Array* arr, void* data);
+int array_add(Array* arr, void* data);
 
 /* Removes the element at index. If the index is larger than the array_get_size, then
  *  nothing is done.

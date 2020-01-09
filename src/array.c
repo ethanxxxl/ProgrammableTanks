@@ -60,7 +60,7 @@ int array_get_size(const Array* arr)
 	return arr->_num_elements;
 }
 
-void array_add(Array* arr, void* data)
+int array_add(Array* arr, void* data)
 {
 	// check if there is enough space to add the new element
 	if ( arr->_num_elements >= arr->_capacity )
@@ -76,6 +76,8 @@ void array_add(Array* arr, void* data)
 
 	// copy data into that location
 	memcpy(p, data, arr->_unit_size);
+
+	return arr->_num_elements - 1;
 }
 
 void array_remove(Array* arr, int index)
