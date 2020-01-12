@@ -65,14 +65,16 @@ typedef struct RigidBody
 	union Bound_Data bounds;
 	enum bound_types bound_type;
 	int _ID; // this is just the RigidBodies index in the rb_buff array
-
-	float rot;
-	float mass;
-
 	Vec2 pos;
+	float rot;
 	Vec2 velocity;
 
-	Array* forces; // <Vec2> list of forces acting on object in newtons
+	float mass;
+	float coef_friction_s; // static friction
+	float coef_friction_k; // kinetic friction
+	Vec2 force_external; /* force from other objects, not friction or drag */
+
+
 } RigidBody;
 
 struct Collision
@@ -92,13 +94,13 @@ void physics_stop();
 void physics_update();
 
 
-/* Creates a rigidbody in the physics engine.
+/* Creates a RigidBody in the physics engine.
  * Return: returns a pointer to that RigidBody, returns NULL of failure.
  */
 RigidBody* physics_add_rigidbody();
 
-
-// TODO add support for this.
+/* Removes a RigidBody from the physics engine.
+ */
 void physics_remove_rigidbody(struct RigidBody* rb);
 
 /* RigidBody Functions

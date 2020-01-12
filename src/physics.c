@@ -10,6 +10,8 @@
 // each element is a pointer to a rigidbody.
 static Array* rb_buff; /* <RigidBody*> */
 
+// TODO try to consolidate all of these last_time variables into one that gets updated
+// in the main function
 // time storage for use in the loop function. it out here so that the init function can set it.
 static struct timespec last_time;
 
@@ -64,10 +66,7 @@ RigidBody* physics_add_rigidbody()
 	// add that space to the master list of RigidBodies
 	// also sets the ID for the RigidBody, so that it can be removed.
 	rb_new->_ID = array_add(rb_buff, &rb_new);
-
-	// initialize the forces array.
-	rb_new->forces = array_init(2, sizeof(Vec2));
-
+	
 	return rb_new;
 }
 
@@ -75,8 +74,6 @@ void physics_remove_rigidbody(RigidBody* rb)
 {
 	// remove rb from the physics RigidBody buffer
 	array_remove(rb_buff, rb->_ID);
-	// kill the forces array
-	array_kill(rb->forces);
 	// free the space allocated for the RigidBody
 	free(rb);
 }
@@ -400,13 +397,48 @@ void physics_update()
 	for ( int i = 0; i < array_get_size(rb_buff); i++ )
 	{
 		RigidBody* rb = *(RigidBody**)array_get(rb_buff, i);
-		Vec2 net_force = {0.0f, 0.0f};
+		printf("RIGIDBODY [%d] [%p]\n", i, rb);
 
-		for ( int f = 0; f < array_get_size(rb->forces); f++ )
-		{
-			vec2_add(&net_force, (Vec2*)array_get(rb->forces, f), &net_force);
-		}
+		// add external forces
+		Vec2 net_force = rb->force_external;
+		printf("net force before: %f, %f\n", net_force.x, net_force.y);
 		
+		// add frictional forces
+		// TODO see if the velocity is capable of reaching true zero.
+		if ( vec2_get_mag(&rb->velocity) <= 0.05f || vec2_get_mag(&rb->velocity) >= -0.05f )
+		{
+			// find the maximum value that the external force can be.
+			const float friction_max = rb->mass * 9.8f * rb->coef_friction_s;
+			Vec2 static_friction;
+			vec2_get_unitv(&rb->force_external, &static_friction);
+			vec2_scale(&static_friction, -friction_max, &static_friction);
+
+			// if the external force is less than that value, then the net force will
+			// be 0
+			if ( vec2_get_mag(&rb->force_external) <= friction_max )
+			{
+				net_force = (Vec2){0.0f, 0.0f};
+				rb->velocity = (Vec2){ 0.0f, 0.0f };
+			}
+			else
+				vec2_add(&net_force, &static_friction, &net_force);
+
+		}
+		else
+		{
+			// find the value of the friction
+			const float friction_mag = rb->mass * 9.8f * rb->coef_friction_k;
+			Vec2 kinetic_friction;
+			vec2_get_unitv(&rb->velocity, &kinetic_friction); // note that kinetic friction is opposite of velocity
+			printf("unit_vector: %f, %f\n", kinetic_friction.x, kinetic_friction.y);
+			vec2_scale(&kinetic_friction, -friction_mag, &kinetic_friction);
+			printf("kinetic friction: %f, %f\n", kinetic_friction.x, kinetic_friction.y);
+
+			vec2_add(&net_force, &kinetic_friction, &net_force);
+		}
+
+		printf("net_force after: %f, %f\n", net_force.x, net_force.y);
+
 		// find the net acceleration
 		Vec2 net_accel;
 		vec2_scale(&net_force, 1/rb->mass, &net_accel);
@@ -421,6 +453,7 @@ void physics_update()
 		// update positon
 		/* essentially: rb->pos += rb->velocity*dt; */
 		vec2_add(&rb->pos, vec2_scale(&rb->velocity, dt, &temp), &rb->pos);
+		printf("\n");
 	}
 
 	/* Collision Handling
