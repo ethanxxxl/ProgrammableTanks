@@ -12,7 +12,7 @@
 #define TANK_MOV_SPEED 10
 #define TANK_ACCELERATION 1
 
-struct Tank
+typedef struct Tank
 {
 	// managed rigidbody used by the physics engine.
 	RigidBody* rb;
@@ -29,12 +29,30 @@ struct Tank
 	
 	// the number of rounds left to shoot. this value should be -1 if infinity.
 	int rounds;
-
 	bool destroyed;
-};
+
+	int _TANK_ID;
+} Tank;
+
+/* Managed Tanks will be indirectly be controlled by the user,
+ * or a script. Tank management system will control the speed, acceleration,
+ * and other details about a tank.
+ */
+void tank_manager_init();
+void tank_manager_stop();
+
+/* Updates information about all tanks.
+ */
+void tank_update();
+
+// Creates a managed tank
+Tank* tank_create();
+
+// Removes a tank from management
+void tank_remove(Tank* tank);
 
 // function that draws the tank.
-void tank_draw(struct SDL_Renderer* renderer, struct Tank* tank);
+void tank_draw(struct SDL_Renderer* renderer);
 
 // rotates the tanks body.
 void tank_rotate(struct Tank* t, float angle);
@@ -42,7 +60,8 @@ void tank_rotate(struct Tank* t, float angle);
 // rotates the tanks turret.
 void tank_rotate_turret(struct Tank* t, float angle);
 
-// moves a tank in a line, based off of it orientation
-void tank_move(struct Tank* t, float distance);
+/* Moves the tank forward at throttle percent of its maximum speed
+ */
+void tank_move(struct Tank* t, float throttle);
 
 #endif
