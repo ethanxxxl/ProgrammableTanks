@@ -129,6 +129,36 @@ void array_set(Array* arr, void* src, int index)
 	memcpy(p, src, arr->_unit_size);
 }
 
+int array_push(Array* arr, void *data)
+{
+	// check if there is enough space to add the new element
+	if ( arr->_num_elements >= arr->_capacity )
+	{
+		// the buffer was to small. double the buffer size.
+		arr->buff = realloc(arr->buff, arr->_capacity*arr->_unit_size*2);
+		arr->_capacity *= 2; // update the capacity tracker.
+	}
+
+	// pointer to the location that data should be written.
+	void* p = arr->buff + (arr->_unit_size * (arr->_num_elements))/sizeof(char);
+	arr->_num_elements++;
+
+	// copy data into that location
+	memcpy(p, data, arr->_unit_size);
+
+	return arr->_num_elements - 1;
+
+}
+
+void array_pop(Array* arr)
+{
+	// remove one from the number of elements
+	arr->_num_elements--;
+	// write over that spot with zeros
+	memset(arr->buff + arr->_unit_size*arr->_num_elements, 0, arr->_unit_size);
+	return;
+}
+
 void array_reset(Array* arr)
 {
 	arr->_num_elements = 0;

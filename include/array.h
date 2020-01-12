@@ -58,6 +58,14 @@ void* array_get_into(const Array* arr, void* dest, int index);
  */
 void array_set(Array* arr, void* src, int index);
 
+/* Synonymous to array_add
+ */
+int array_push(Array* arr, void* data);
+
+/* Removes the newest element from the array.
+ */
+void array_pop(Array* arr);
+
 /* Resets the array back to 0 elements
  * Note: this does not overwrite the data in those positions. use array_clear
  * for that.
