@@ -2,35 +2,44 @@
 #define TERMINAL_DIAGS_H
 
 #include <array.h>
+#include <curses.h>
 
 struct Diagnostic_Table
 {
 	// title of the table
-	char title[50];
+	char* title;
 	
 	// array of char* to c_strs
 	Array *elements;
 
+	int start_x;
+	int start_y;
 	int width;
 	int height;
 
 	int current_element;
+
+	WINDOW* win;
 };
 
 // master list of all diagnostic tables
 static Array *diagnostic_tables;
+static int active_table;
+
+// padding between tables
+const static int PADDING = 1;
 
 // starts and stops ncurses and such
-void init_terminal_diags();
-void stop_terminal_diags();
+void terminal_diags_init();
+void terminal_diags_stop();
 
 // updates the display (call this every frame)
-void update_terminal_diags();
+void terminal_diags_update();
 
 /* creates/adds a diagnostic table, that has multiple diagnostic elements.
  * returns a pointer to the new diagnostic table
  */
-struct Diagnostic_Table* diag_table_init();
+struct Diagnostic_Table* diag_table_init(const char* title, int width, int height);
 
 /* Removes the diagnostic table from diagnostic_tables, and also
  * frees the memory that the table was stored in. therefore, that pointer will
@@ -39,15 +48,36 @@ struct Diagnostic_Table* diag_table_init();
 void diag_table_kill(struct Diagnostic_Table *table);
 
 /* table should be the table that you want to add an element to.
- * element should be the text of the element that will be added.
+ * text should be the text of the element that will be added.
  *
- * returns an array (of type char) which is to be used as a fancy string.
- * keep this. it is important.
+ * returns a char* to the text of the element that was just created. don't lose this, you need it later
  */
-Array* diag_table_add_element(struct Diagnostic_Table *table);
+char* diag_table_add_element(struct Diagnostic_Table *table, const char* text);
 
-/* a little helper function so that you don't have to use strcpy on the array. :)
- * this does NOT update the display. use update_terminal_diags() for that.
+/* table is the table that should be modified
+ * element the address of a variable containing an address to the element text.
+ * text is the new text
+ *
+ * this will change out the string, however, the address to the elemnt can/will change, so
+ * a double pointer is needed so that that address can be updated
  */
-void diag_element_update(Array* element, char* text);
+void diag_table_update_element(struct Diagnostic_Table* table, char** element, const char* text);
+
+/* table is the table that should be modified
+ * element the element that will be removed
+ *
+ * removes the element from the table. element will no longer be valid after this operation
+ */
+void diag_table_remove_element(struct Diagnostic_Table* table, char* element);
+
+// cycles through the currently active table
+//  any number greater than or equal to 1 will cycle forwards.
+//  any number less than 1 cycles backwards
+void diag_table_cycle(int direction);
+
+// cycles through the currently active element
+//  any number greater than or equal to 1 will cycle forwards.
+//  any number less than 1 cycles backwards
+void diag_table_cycle_element(int direction);
+
 #endif
